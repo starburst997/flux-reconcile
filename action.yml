@@ -1,0 +1,74 @@
+name: "FluxCD Reconcile"
+description: "Trigger FluxCD reconciliation for HelmChart and HelmRelease"
+author: "starburst997"
+branding:
+  icon: "refresh-cw"
+  color: "purple"
+
+inputs:
+  kube-config:
+    description: "Kubernetes configuration (base64 encoded or plain text)"
+    required: true
+  chart-name:
+    description: "Name of the HelmChart to reconcile"
+    required: true
+  registry-namespace:
+    description: "Namespace where the HelmChart source is located"
+    required: true
+  release-name:
+    description: "Name of the HelmRelease to reconcile"
+    required: true
+  release-namespace:
+    description: "Namespace where the HelmRelease is located"
+    required: true
+  chart-timeout:
+    description: "Timeout for HelmChart reconciliation (default: 2m)"
+    required: false
+    default: "2m"
+  release-timeout:
+    description: "Timeout for HelmRelease reconciliation (default: 5m)"
+    required: false
+    default: "5m"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Configure kubectl
+      shell: bash
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ inputs.kube-config }}" > ~/.kube/config
+        chmod 600 ~/.kube/config
+        echo "✅ Configured kubectl"
+
+    - name: Install FluxCD CLI
+      shell: bash
+      run: |
+        if ! command -v flux &> /dev/null; then
+          echo "📦 Installing FluxCD CLI..."
+          curl -s https://fluxcd.io/install.sh | sudo bash
+          echo "✅ FluxCD CLI installed"
+        else
+          echo "✅ FluxCD CLI already available"
+        fi
+
+    - name: Reconcile HelmChart
+      shell: bash
+      run: |
+        echo "🔄 Reconciling HelmChart '${{ inputs.chart-name }}' in namespace '${{ inputs.registry-namespace }}'..."
+        flux reconcile source chart ${{ inputs.chart-name }} \
+          -n ${{ inputs.registry-namespace }} \
+          --timeout=${{ inputs.chart-timeout }}
+        echo "✅ HelmChart reconciled successfully"
+
+    - name: Reconcile HelmRelease
+      shell: bash
+      run: |
+        echo "🔄 Reconciling HelmRelease '${{ inputs.release-name }}' in namespace '${{ inputs.release-namespace }}'..."
+        flux reconcile helmrelease ${{ inputs.release-name }} \
+          -n ${{ inputs.release-namespace }} \
+          --timeout=${{ inputs.release-timeout }}
+        echo "✅ HelmRelease reconciled successfully"
