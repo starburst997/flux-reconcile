@@ -319,10 +319,10 @@
           </div>
 
           <div class="feature">
-            <div class="feature-icon">🔐</div>
-            <h3>Secure & Simple</h3>
+            <div class="feature-icon">🎯</div>
+            <h3>Simple Mode</h3>
             <p>
-              Configurable timeouts and secure kubectl configuration
+              Quick setup with smart defaults for common use cases
             </p>
           </div>
         </div>
@@ -334,13 +334,32 @@
         <h2 class="section-title">Quick Start</h2>
         <p class="section-subtitle">Add to your workflow in seconds</p>
 
+        <h3 style="margin-top: 2rem; font-size: 1.6rem; color: #333">
+          Simple Mode (Recommended)
+        </h3>
         <div class="code-block">- <span class="key">uses</span>: <span class="value">starburst997/flux-reconcile@v1</span>
   <span class="keyword">with</span>:
     <span class="key">kube-config</span>: <span class="value">${{ secrets.KUBE_CONFIG }}</span>
-    <span class="key">chart-name</span>: <span class="value">my-app-my-app</span>
-    <span class="key">registry-namespace</span>: <span class="value">flux-registry</span>
-    <span class="key">release-name</span>: <span class="value">my-app</span>
-    <span class="key">release-namespace</span>: <span class="value">my-app</span></div>
+    <span class="key">name</span>: <span class="value">my-app</span>
+    <span class="key">namespace</span>: <span class="value">my-app</span></div>
+
+        <p style="margin-top: 1rem; color: #666; font-size: 0.95rem">
+          This automatically reconciles HelmChart <code style="background: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">my-app-my-app</code>
+          in <code style="background: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">flux-registry</code> and
+          HelmRelease <code style="background: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">my-app</code>
+          in <code style="background: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">my-app</code> namespace.
+        </p>
+
+        <h3 style="margin-top: 3rem; font-size: 1.6rem; color: #333">
+          Advanced Mode
+        </h3>
+        <div class="code-block">- <span class="key">uses</span>: <span class="value">starburst997/flux-reconcile@v1</span>
+  <span class="keyword">with</span>:
+    <span class="key">kube-config</span>: <span class="value">${{ secrets.KUBE_CONFIG }}</span>
+    <span class="key">chart-name</span>: <span class="value">custom-chart-name</span>
+    <span class="key">registry-namespace</span>: <span class="value">custom-registry</span>
+    <span class="key">release-name</span>: <span class="value">custom-release</span>
+    <span class="key">release-namespace</span>: <span class="value">custom-namespace</span></div>
 
         <h3 style="margin-top: 3rem; font-size: 1.8rem; color: #333">
           Complete Example
@@ -365,10 +384,8 @@
       - <span class="key">uses</span>: <span class="value">starburst997/flux-reconcile@v1</span>
         <span class="keyword">with</span>:
           <span class="key">kube-config</span>: <span class="value">${{ secrets.KUBE_CONFIG }}</span>
-          <span class="key">chart-name</span>: <span class="value">my-app-my-app</span>
-          <span class="key">registry-namespace</span>: <span class="value">flux-registry</span>
-          <span class="key">release-name</span>: <span class="value">my-app</span>
-          <span class="key">release-namespace</span>: <span class="value">my-app</span></div>
+          <span class="key">name</span>: <span class="value">my-app</span>
+          <span class="key">namespace</span>: <span class="value">my-app</span></div>
       </div>
     </section>
 
@@ -396,27 +413,39 @@
               <td>-</td>
             </tr>
             <tr>
+              <td><code>name</code></td>
+              <td>Simple mode: Application name (generates <code>name-name</code> for chart)</td>
+              <td>No</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><code>namespace</code></td>
+              <td>Simple mode: Application namespace</td>
+              <td>No</td>
+              <td>-</td>
+            </tr>
+            <tr>
               <td><code>chart-name</code></td>
-              <td>Name of the HelmChart to reconcile</td>
-              <td>Yes</td>
+              <td>Advanced: Name of the HelmChart (ignored if <code>name</code> is provided)</td>
+              <td>No</td>
               <td>-</td>
             </tr>
             <tr>
               <td><code>registry-namespace</code></td>
               <td>Namespace where the HelmChart source is located</td>
-              <td>Yes</td>
-              <td>-</td>
+              <td>No</td>
+              <td>flux-registry</td>
             </tr>
             <tr>
               <td><code>release-name</code></td>
-              <td>Name of the HelmRelease to reconcile</td>
-              <td>Yes</td>
+              <td>Advanced: HelmRelease name (ignored if <code>name</code> is provided)</td>
+              <td>No</td>
               <td>-</td>
             </tr>
             <tr>
               <td><code>release-namespace</code></td>
-              <td>Namespace where the HelmRelease is located</td>
-              <td>Yes</td>
+              <td>Advanced: HelmRelease namespace (ignored if <code>namespace</code> is provided)</td>
+              <td>No</td>
               <td>-</td>
             </tr>
             <tr>
