@@ -12,7 +12,7 @@ A GitHub Action that triggers FluxCD reconciliation for HelmChart sources and He
 
 ## Usage
 
-### Simple Mode (Recommended)
+### Simple Mode
 
 For most cases where your chart follows the `{name}-{name}` naming convention:
 
