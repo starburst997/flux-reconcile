@@ -36,6 +36,10 @@ inputs:
     description: "Timeout for HelmRelease reconciliation"
     required: false
     default: "5m"
+  git-push:
+    description: "Push commits and tags to remote repository"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -97,3 +101,17 @@ runs:
           -n ${RELEASE_NS} \
           --timeout=${{ inputs.release-timeout }}
         echo "✅ HelmRelease reconciled successfully"
+
+    - name: Push commits and tags
+      if: inputs.git-push == 'true'
+      shell: bash
+      run: |
+        echo "🚀 Pushing all changes and tags to remote repository"
+
+        # Push tags only
+        git push --force origin --tags
+
+        # Push all changes
+        git push
+
+        echo "✅ Successfully pushed all changes and tags"

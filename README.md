@@ -91,6 +91,7 @@ jobs:
 | `release-namespace`  | Advanced: HelmRelease namespace (ignored if `namespace` is provided)         | No       | -               |
 | `chart-timeout`      | Timeout for HelmChart reconciliation                                         | No       | `2m`            |
 | `release-timeout`    | Timeout for HelmRelease reconciliation                                       | No       | `5m`            |
+| `git-push`           | Push commits and tags to remote repository                                   | No       | `false`         |
 
 ## How It Works
 
