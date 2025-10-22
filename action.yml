@@ -71,7 +71,7 @@ runs:
       run: |
         # Determine chart name and registry namespace
         if [[ -n "${{ inputs.name }}" ]]; then
-          CHART_NAME="${{ inputs.name }}-${{ inputs.name }}"
+          CHART_NAME="${{ inputs.namespace }}-${{ inputs.name }}"
           REGISTRY_NS="${{ inputs.registry-namespace }}"
         else
           CHART_NAME="${{ inputs.chart-name }}"
