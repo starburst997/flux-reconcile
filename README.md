@@ -91,6 +91,8 @@ jobs:
 | `release-namespace`  | Advanced: HelmRelease namespace (ignored if `namespace` is provided)         | No       | -               |
 | `chart-timeout`      | Timeout for HelmChart reconciliation                                         | No       | `2m`            |
 | `release-timeout`    | Timeout for HelmRelease reconciliation                                       | No       | `5m`            |
+| `version`            | Expected chart version to verify after reconciliation                        | No       | -               |
+| `clean-version`      | Clean version string by removing 'v' prefix and '-XXXXXX' suffix             | No       | `true`          |
 | `git-push`           | Push commits and tags to remote repository                                   | No       | `false`         |
 
 ## How It Works
@@ -101,6 +103,7 @@ This action performs the following steps:
 2. **Install FluxCD CLI** - Ensures the Flux CLI is available (skips if already installed)
 3. **Reconcile HelmChart** - Triggers reconciliation of the HelmChart source to fetch the latest chart from your OCI registry
 4. **Reconcile HelmRelease** - Triggers reconciliation of the HelmRelease to deploy the updated chart
+5. **Verify Version** (optional) - Verifies the deployed version matches the expected version
 
 ## License
 
