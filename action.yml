@@ -40,6 +40,13 @@ inputs:
     description: "Push commits and tags to remote repository"
     required: false
     default: "false"
+  version:
+    description: "Expected chart version to verify after reconciliation (optional)"
+    required: false
+  clean-version:
+    description: "Clean version string by removing 'v' prefix and '-XXXXXX' suffix"
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
@@ -101,6 +108,53 @@ runs:
           -n ${RELEASE_NS} \
           --timeout=${{ inputs.release-timeout }}
         echo "✅ HelmRelease reconciled successfully"
+
+    - name: Verify version
+      if: inputs.version != ''
+      shell: bash
+      run: |
+        # Determine release name and namespace
+        if [[ -n "${{ inputs.name }}" ]]; then
+          RELEASE_NAME="${{ inputs.name }}"
+          RELEASE_NS="${{ inputs.namespace }}"
+        else
+          RELEASE_NAME="${{ inputs.release-name }}"
+          RELEASE_NS="${{ inputs.release-namespace }}"
+        fi
+
+        # Get expected version
+        EXPECTED_VERSION="${{ inputs.version }}"
+
+        # Clean version if requested
+        if [[ "${{ inputs.clean-version }}" == "true" ]]; then
+          # Remove 'v' prefix
+          EXPECTED_VERSION="${EXPECTED_VERSION#v}"
+          # Remove '-XXXXXX' suffix (dash followed by any characters)
+          EXPECTED_VERSION="${EXPECTED_VERSION%%-*}"
+        fi
+
+        echo "🔍 Verifying HelmRelease version..."
+        echo "Expected version: ${EXPECTED_VERSION}"
+
+        # Get actual version from HelmRelease
+        ACTUAL_VERSION=$(kubectl get helmrelease ${RELEASE_NAME} -n ${RELEASE_NS} -o jsonpath='{.status.lastAttemptedRevision}')
+
+        # Clean actual version if requested
+        if [[ "${{ inputs.clean-version }}" == "true" ]]; then
+          ACTUAL_VERSION="${ACTUAL_VERSION#v}"
+          ACTUAL_VERSION="${ACTUAL_VERSION%%-*}"
+        fi
+
+        echo "Actual version: ${ACTUAL_VERSION}"
+
+        if [[ "${ACTUAL_VERSION}" == "${EXPECTED_VERSION}" ]]; then
+          echo "✅ Version verification successful"
+        else
+          echo "❌ Version mismatch!"
+          echo "Expected: ${EXPECTED_VERSION}"
+          echo "Got: ${ACTUAL_VERSION}"
+          exit 1
+        fi
 
     - name: Push commits and tags
       if: inputs.git-push == 'true'
